@@ -184,30 +184,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary">10+</div>
-              <div className="text-sm text-muted-foreground mt-1">Church Events</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary">500+</div>
-              <div className="text-sm text-muted-foreground mt-1">Questions Created</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary">200+</div>
-              <div className="text-sm text-muted-foreground mt-1">Players</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-primary">₦1M+</div>
-              <div className="text-sm text-muted-foreground mt-1">Prizes Won</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* How It Works */}
       <section id="how-it-works" className="py-16 md:py-24">
         <div className="container mx-auto px-4">
