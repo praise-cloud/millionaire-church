@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { Trophy, LogOut, Play, Loader2, Key } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 type Profile = {
   id: string
@@ -123,7 +124,8 @@ export default function ContestantLobby() {
             <Trophy className="h-6 w-6 text-yellow-500" />
             <span className="font-bold text-lg">Contestant Lobby</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <span className="text-sm text-muted-foreground">{profile?.full_name}</span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-1" /> Sign Out

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Trophy, UserPlus, Gamepad2, LogOut, LayoutDashboard, Loader2 } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 type UserData = {
   id: string
@@ -65,7 +66,8 @@ export default function Home() {
             <Trophy className="h-6 w-6 text-yellow-500" />
             <span className="font-bold text-xl">Millionaire Church</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : user ? (

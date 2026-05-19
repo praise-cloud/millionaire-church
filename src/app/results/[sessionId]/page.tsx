@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Trophy, Home, CheckCircle2, XCircle } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 
 type RoundResult = {
@@ -75,6 +76,7 @@ export default function ResultsPage() {
             <Trophy className="h-6 w-6 text-yellow-500" />
             <span className="font-bold text-lg">Game Results</span>
           </div>
+          <div><ThemeToggle /></div>
         </div>
       </header>
 
