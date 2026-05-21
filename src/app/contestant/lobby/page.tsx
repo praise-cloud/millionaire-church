@@ -81,12 +81,13 @@ export default function ContestantLobby() {
     if (!profile || !joinCode.trim()) { toast.error("Enter a join code"); return }
     setJoining(true)
 
-    const { data: session } = await supabase
+    const { data: sessions } = await supabase
       .from("game_sessions")
       .select("*")
       .eq("join_code", joinCode.trim().toUpperCase())
       .is("contestant_id", null)
-      .single()
+
+    const session = sessions?.[0] || null
 
     if (!session) {
       toast.error("Invalid code or session already taken")

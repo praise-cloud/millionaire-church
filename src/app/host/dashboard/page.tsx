@@ -99,7 +99,7 @@ export default function HostDashboard() {
 
     const joinCode = Math.random().toString(36).substring(2, 8).toUpperCase()
 
-    const { data: session, error } = await supabase
+    const { data: sessions, error } = await supabase
       .from("game_sessions")
       .insert({
         host_id: profile.id,
@@ -107,12 +107,13 @@ export default function HostDashboard() {
         status: "waiting",
       })
       .select()
-      .single()
 
-    if (error) {
+    if (error || !sessions?.[0]) {
       toast.error("Failed to create session")
       return
     }
+
+    const session = sessions[0]
 
     // Link questions to session
     const sessionQuestions = questions.map((q, i) => ({

@@ -36,12 +36,12 @@ export default function ResultsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push("/auth"); return }
 
-      const { data: session } = await supabase
+      const { data: sessions } = await supabase
         .from("game_sessions")
         .select("total_prize, status")
         .eq("id", params.sessionId)
-        .single()
 
+      const session = sessions?.[0] || null
       if (!session) { router.push("/"); return }
       setSession(session)
 
