@@ -50,10 +50,10 @@ export default function HostDashboard() {
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single()
+        .maybeSingle()
 
       if (!profile || profile.role !== "host") {
-        router.push("/")
+        router.push("/auth")
         return
       }
 

@@ -31,6 +31,24 @@ function AuthForm() {
 
   const supabase = createClient()
 
+  const redirectToDashboard = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { router.push("/"); return }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle()
+    if (profile?.role === "host") {
+      router.push("/host/dashboard")
+    } else if (profile?.role === "contestant") {
+      router.push("/contestant/lobby")
+    } else {
+      router.push("/")
+    }
+    router.refresh()
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -39,8 +57,7 @@ function AuthForm() {
       password: loginPassword,
     })
     if (error) { toast.error(error.message); setLoading(false); return }
-    router.push("/")
-    router.refresh()
+    await redirectToDashboard()
   }
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -52,13 +69,27 @@ function AuthForm() {
       options: { data: { full_name: regName, role: regRole } },
     })
     if (authError) { toast.error(authError.message); setLoading(false); return }
+
     if (authData.user) {
       const { error: profileError } = await supabase.from("profiles").insert({
         id: authData.user.id, email: regEmail, full_name: regName, role: regRole,
       })
-      if (profileError) { toast.error("Account created but profile setup failed."); setLoading(false); return }
+      if (profileError) {
+        toast.error("Account created but profile setup failed. Please contact support.")
+        setLoading(false)
+        return
+      }
     }
-    toast.success("Account created! You can now sign in.")
+
+    // If session exists (email confirmation disabled), go straight to dashboard
+    if (authData.session) {
+      toast.success("Account created! Redirecting...")
+      await redirectToDashboard()
+      return
+    }
+
+    // Otherwise tell them to check email
+    toast.success("Account created! Check your email to confirm, then sign in.")
     setTab("login")
     setLoading(false)
   }

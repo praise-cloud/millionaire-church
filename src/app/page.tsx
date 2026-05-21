@@ -35,11 +35,28 @@ export default function Home() {
     async function checkUser() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        const { data: profile } = await supabase
+        let { data: profile } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", authUser.id)
-          .single()
+          .maybeSingle()
+
+        // If no profile exists yet, create one from auth metadata
+        if (!profile && authUser.user_metadata) {
+          const meta = authUser.user_metadata
+          const { data: newProfile } = await supabase
+            .from("profiles")
+            .insert({
+              id: authUser.id,
+              email: authUser.email || "",
+              full_name: meta.full_name || meta.name || "User",
+              role: meta.role || "contestant",
+            })
+            .select()
+            .maybeSingle()
+          profile = newProfile || null
+        }
+
         setUser(profile)
       }
       setLoading(false)
