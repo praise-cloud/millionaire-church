@@ -113,7 +113,11 @@ CREATE POLICY "Hosts can delete their own questions"
 -- Game sessions: hosts and contestants can read
 CREATE POLICY "Users can read their sessions"
   ON game_sessions FOR SELECT
-  USING (auth.uid() = host_id OR auth.uid() = contestant_id);
+  USING (
+    auth.uid() = host_id OR
+    auth.uid() = contestant_id OR
+    (status = 'waiting' AND contestant_id IS NULL)
+  );
 
 CREATE POLICY "Hosts can create sessions"
   ON game_sessions FOR INSERT
@@ -121,7 +125,11 @@ CREATE POLICY "Hosts can create sessions"
 
 CREATE POLICY "Hosts or contestants can update sessions"
   ON game_sessions FOR UPDATE
-  USING (auth.uid() = host_id OR auth.uid() = contestant_id);
+  USING (
+    auth.uid() = host_id OR
+    auth.uid() = contestant_id OR
+    (status = 'waiting' AND contestant_id IS NULL)
+  );
 
 -- Game rounds: participants can read
 CREATE POLICY "Users can read their rounds"

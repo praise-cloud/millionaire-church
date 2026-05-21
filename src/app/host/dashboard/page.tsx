@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { Trophy, Plus, LogOut, ClipboardList, Play, Users, Loader2 } from "lucide-react"
+import { Trophy, Plus, LogOut, ClipboardList, Play, Users, Loader2, Trash2 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 type Profile = {
@@ -65,7 +65,7 @@ export default function HostDashboard() {
         .eq("host_id", user.id)
         .order("created_at", { ascending: false })
 
-      if (sessions) setSessions(sessions)
+      if (sessions) setSessions(sessions.filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i))
 
       const { count } = await supabase
         .from("questions")
@@ -124,8 +124,25 @@ export default function HostDashboard() {
 
     await supabase.from("session_questions").insert(sessionQuestions)
 
-    toast.success(`Session created! Join code: ${joinCode}`)
-    setSessions([session, ...sessions])
+      toast.success(`Session created! Join code: ${joinCode}`)
+      setSessions(prev => [session, ...prev])
+  }
+
+  const deleteSession = async (sessionId: string) => {
+    if (!confirm("Delete this session? This cannot be undone.")) return
+
+    const { error } = await supabase
+      .from("game_sessions")
+      .delete()
+      .eq("id", sessionId)
+
+    if (error) {
+      toast.error("Failed to delete session")
+      return
+    }
+
+    setSessions(prev => prev.filter(s => s.id !== sessionId))
+    toast.success("Session deleted")
   }
 
   if (loading) {
@@ -223,8 +240,13 @@ export default function HostDashboard() {
                       {session.status === "completed" && ` | Prize: ₦${session.total_prize.toLocaleString()}`}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(session.created_at).toLocaleDateString()}
+                  <div className="flex items-center gap-3">
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(session.created_at).toLocaleDateString()}
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => deleteSession(session.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
