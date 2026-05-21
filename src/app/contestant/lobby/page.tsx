@@ -39,6 +39,8 @@ export default function ContestantLobby() {
   const supabase = createClient()
 
   useEffect(() => {
+    let cancelled = false
+
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push("/auth"); return }
@@ -48,6 +50,7 @@ export default function ContestantLobby() {
       const profile = profiles?.[0] || null
       if (!profile || profile.role !== "contestant") { router.push("/auth"); return }
 
+      if (cancelled) return
       setProfile(profile)
 
       const { data: sessions } = await supabase
@@ -57,10 +60,27 @@ export default function ContestantLobby() {
         .is("contestant_id", null)
         .order("created_at", { ascending: false })
 
-      if (sessions) setSessions(sessions)
-      setLoading(false)
+      if (!cancelled) {
+        if (sessions) setSessions(sessions)
+        setLoading(false)
+      }
     }
+
     load()
+
+    const channel = supabase
+      .channel("game_sessions_changes")
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: "game_sessions" }, (payload) => {
+        if (payload.old?.id) {
+          setSessions(prev => prev.filter(s => s.id !== payload.old.id))
+        }
+      })
+      .subscribe()
+
+    return () => {
+      cancelled = true
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const handleJoin = async (sessionId: string) => {
