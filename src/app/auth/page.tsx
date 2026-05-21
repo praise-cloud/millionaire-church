@@ -34,11 +34,12 @@ function AuthForm() {
   const redirectToDashboard = async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push("/"); return }
-    const { data: profile } = await supabase
+    const { data: profiles } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
-      .maybeSingle()
+
+    const profile = profiles?.[0] || null
     if (profile?.role === "host") {
       router.push("/host/dashboard")
     } else if (profile?.role === "contestant") {

@@ -43,8 +43,9 @@ export default function ContestantLobby() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push("/auth"); return }
 
-      const { data: profile } = await supabase
-        .from("profiles").select("*").eq("id", user.id).maybeSingle()
+      const { data: profiles } = await supabase
+        .from("profiles").select("*").eq("id", user.id)
+      const profile = profiles?.[0] || null
       if (!profile || profile.role !== "contestant") { router.push("/auth"); return }
 
       setProfile(profile)

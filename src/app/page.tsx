@@ -35,16 +35,17 @@ export default function Home() {
     async function checkUser() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (authUser) {
-        let { data: profile } = await supabase
+        const { data: profiles } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", authUser.id)
-          .maybeSingle()
 
-        // If no profile exists yet, create one from auth metadata
+        let profile = profiles?.[0] || null
+
+        // If profile doesn't exist, create one from auth metadata
         if (!profile && authUser.user_metadata) {
           const meta = authUser.user_metadata
-          const { data: newProfile } = await supabase
+          const { data: newProfiles, error: insertError } = await supabase
             .from("profiles")
             .insert({
               id: authUser.id,
@@ -53,8 +54,7 @@ export default function Home() {
               role: meta.role || "contestant",
             })
             .select()
-            .maybeSingle()
-          profile = newProfile || null
+          if (!insertError) profile = newProfiles?.[0] || null
         }
 
         setUser(profile)

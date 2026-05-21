@@ -46,12 +46,12 @@ export default function HostDashboard() {
         return
       }
 
-      const { data: profile } = await supabase
+      const { data: profiles } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .maybeSingle()
 
+      const profile = profiles?.[0] || null
       if (!profile || profile.role !== "host") {
         router.push("/auth")
         return
