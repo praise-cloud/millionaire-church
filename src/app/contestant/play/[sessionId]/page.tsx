@@ -111,7 +111,10 @@ export default function ContestantPlay() {
     setIsCorrect(correct)
     setAnswered(true)
 
-    const prize = correct ? currentQuestion.prize_amount : 0
+    const prizeChange = correct
+      ? currentQuestion.prize_amount
+      : -Math.min(currentQuestion.prize_amount, session.total_prize)
+    const newPrize = Math.max(0, session.total_prize + prizeChange)
     const nextIndex = currentIndex + 1
 
     await supabase.from("game_rounds").insert({
@@ -119,29 +122,20 @@ export default function ContestantPlay() {
       question_id: currentQuestion.id,
       contestant_answer: answer,
       is_correct: correct,
-      prize_earned: prize,
+      prize_earned: correct ? currentQuestion.prize_amount : 0,
     })
 
-    if (correct) {
-      await supabase
-        .from("game_sessions")
-        .update({ total_prize: session.total_prize + prize, current_question_index: nextIndex })
-        .eq("id", session.id)
-      setSession({ ...session, total_prize: session.total_prize + prize, current_question_index: nextIndex })
-    } else {
-      await supabase
-        .from("game_sessions")
-        .update({ status: "completed", current_question_index: currentIndex, completed_at: new Date().toISOString() })
-        .eq("id", session.id)
-      setGameOver(true)
-    }
+    await supabase
+      .from("game_sessions")
+      .update({ total_prize: newPrize, current_question_index: nextIndex })
+      .eq("id", session.id)
+    setSession({ ...session, total_prize: newPrize, current_question_index: nextIndex })
 
     setSubmitting(false)
   }
 
   const handleNext = () => {
     if (currentIndex + 1 >= questions.length) {
-      // Game complete
       supabase
         .from("game_sessions")
         .update({ status: "completed", completed_at: new Date().toISOString() })
@@ -239,9 +233,7 @@ export default function ContestantPlay() {
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-lg">
-                {isCorrect === false
-                  ? "Wrong answer! You leave with..."
-                  : "Congratulations! You completed all questions!"}
+                Congratulations! You completed all questions!
               </p>
               <div className="text-5xl font-bold text-yellow-500">
                 ₦{session?.total_prize.toLocaleString() || "0"}

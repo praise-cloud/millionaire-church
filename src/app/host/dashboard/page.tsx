@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { Trophy, Plus, LogOut, ClipboardList, Play, Users, Loader2, Trash2 } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -29,12 +34,23 @@ type Session = {
   created_at: string
 }
 
+type Question = {
+  id: string
+  question_text: string
+  prize_amount: number
+}
+
 export default function HostDashboard() {
   const router = useRouter()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [questionsCount, setQuestionsCount] = useState(0)
   const [loading, setLoading] = useState(true)
+
+  const [showPicker, setShowPicker] = useState(false)
+  const [allQuestions, setAllQuestions] = useState<Question[]>([])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [creating, setCreating] = useState(false)
 
   const supabase = createClient()
 
@@ -84,18 +100,40 @@ export default function HostDashboard() {
     router.refresh()
   }
 
-  const createSession = async () => {
+  const openQuestionPicker = async () => {
     if (!profile) return
 
     const { data: questions } = await supabase
       .from("questions")
-      .select("id")
+      .select("id, question_text, prize_amount")
       .eq("host_id", profile.id)
 
     if (!questions || questions.length === 0) {
       toast.error("Create at least one question first!")
       return
     }
+
+    setAllQuestions(questions)
+    setSelectedIds(new Set(questions.map(q => q.id)))
+    setShowPicker(true)
+  }
+
+  const toggleQuestion = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const doCreateSession = async () => {
+    if (!profile || selectedIds.size === 0) {
+      toast.error("Select at least one question!")
+      return
+    }
+
+    setCreating(true)
 
     const joinCode = Math.random().toString(36).substring(2, 8).toUpperCase()
 
@@ -110,22 +148,25 @@ export default function HostDashboard() {
 
     if (error || !sessions?.[0]) {
       toast.error("Failed to create session")
+      setCreating(false)
       return
     }
 
     const session = sessions[0]
 
-    // Link questions to session
-    const sessionQuestions = questions.map((q, i) => ({
+    const orderedIds = allQuestions.filter(q => selectedIds.has(q.id)).map(q => q.id)
+    const sessionQuestions = orderedIds.map((qId, i) => ({
       session_id: session.id,
-      question_id: q.id,
+      question_id: qId,
       question_order: i,
     }))
 
     await supabase.from("session_questions").insert(sessionQuestions)
 
-      toast.success(`Session created! Join code: ${joinCode}`)
-      setSessions(prev => [session, ...prev])
+    setShowPicker(false)
+    setCreating(false)
+    toast.success(`Session created! Join code: ${joinCode}`)
+    setSessions(prev => [session, ...prev])
   }
 
   const deleteSession = async (sessionId: string) => {
@@ -210,7 +251,7 @@ export default function HostDashboard() {
               <Plus className="h-4 w-4" /> Manage Questions
             </Button>
           </Link>
-          <Button onClick={createSession} variant="secondary" className="gap-2">
+          <Button onClick={openQuestionPicker} variant="secondary" className="gap-2">
             <Play className="h-4 w-4" /> Create New Session
           </Button>
         </div>
@@ -254,6 +295,41 @@ export default function HostDashboard() {
           </div>
         )}
       </main>
+
+      <Dialog open={showPicker} onOpenChange={(o) => { if (!o && !creating) setShowPicker(false) }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Select Questions</DialogTitle>
+            <DialogDescription>
+              Choose which questions to include in this session ({selectedIds.size} selected)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 max-h-80 overflow-y-auto py-2">
+            {allQuestions.map((q) => (
+              <label key={q.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer">
+                <Checkbox
+                  checked={selectedIds.has(q.id)}
+                  onCheckedChange={() => toggleQuestion(q.id)}
+                  className="mt-0.5"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{q.question_text}</p>
+                  <p className="text-xs text-muted-foreground">₦{q.prize_amount.toLocaleString()}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPicker(false)} disabled={creating}>
+              Cancel
+            </Button>
+            <Button onClick={doCreateSession} disabled={creating || selectedIds.size === 0}>
+              {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
+              Create Session ({selectedIds.size} questions)
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
