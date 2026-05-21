@@ -32,9 +32,11 @@ export default function Home() {
   const supabase = createClient()
 
   useEffect(() => {
+    let cancelled = false
+
     async function checkUser() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (authUser) {
+      if (!cancelled && authUser) {
         const { data: profiles } = await supabase
           .from("profiles")
           .select("*")
@@ -42,26 +44,35 @@ export default function Home() {
 
         let profile = profiles?.[0] || null
 
-        // If profile doesn't exist, create one from auth metadata
         if (!profile && authUser.user_metadata) {
           const meta = authUser.user_metadata
-          const { data: newProfiles, error: insertError } = await supabase
+          const { data: newProfiles } = await supabase
             .from("profiles")
             .insert({
               id: authUser.id,
-              email: authUser.email || "",
-              full_name: meta.full_name || meta.name || "User",
-              role: meta.role || "contestant",
+              email: meta.email || authUser.email || "",
+              full_name: meta.full_name || meta.name || "",
+              role: meta.role || "",
             })
             .select()
-          if (!insertError) profile = newProfiles?.[0] || null
+          if (!cancelled) profile = newProfiles?.[0] || null
         }
 
-        setUser(profile)
+        if (!cancelled && profile) {
+          setUser({
+            id: profile.id,
+            email: profile.email,
+            full_name: profile.full_name,
+            role: profile.role,
+          })
+        }
       }
-      setLoading(false)
+      if (!cancelled) setLoading(false)
     }
+
     checkUser()
+
+    return () => { cancelled = true }
   }, [])
 
   const handleSignOut = async () => {
