@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Trophy, Loader2 } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+
 
 function AuthForm() {
   const router = useRouter()
@@ -97,7 +97,7 @@ function AuthForm() {
 
   return (
     <div className="flex flex-1 items-center justify-center p-4 relative">
-      <div className="absolute top-4 right-4"><ThemeToggle /></div>
+
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center gap-2 mb-8">
           <Trophy className="h-8 w-8 text-yellow-500" />

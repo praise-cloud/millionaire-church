@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { Trophy, Plus, LogOut, ClipboardList, Play, Users, Loader2, Trash2 } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+
 
 type Profile = {
   id: string
@@ -203,7 +203,6 @@ export default function HostDashboard() {
             <span className="font-bold text-lg">Host Dashboard</span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <span className="text-sm text-muted-foreground">{profile?.full_name}</span>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-1" /> Sign Out

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Loader2, Trophy, Phone, Users, HelpCircle, Sun, Moon } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+
 import { toast } from "sonner"
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
@@ -213,7 +213,6 @@ export default function ContestantPlay() {
             <span className="font-bold text-lg">Who Wants to Be a Millionaire</span>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <div className="text-yellow-500 font-bold text-lg">
               ₦{session?.total_prize.toLocaleString() || "0"}
             </div>

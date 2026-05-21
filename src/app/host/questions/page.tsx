@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { Trophy, Plus, Pencil, Trash2, ArrowLeft, Loader2 } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+
 import Link from "next/link"
 
 type Question = {
@@ -148,7 +148,6 @@ export default function HostQuestions() {
             <span className="font-bold text-lg">Manage Questions</span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Link href="/host/dashboard">
               <Button variant="outline" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-1" /> Back to Dashboard
@@ -245,7 +244,7 @@ export default function HostQuestions() {
                             key={opt.key}
                             className={`px-3 py-1.5 rounded border ${
                               q.correct_answer === opt.key
-                                ? "border-green-500 bg-green-50 dark:bg-green-950"
+                                ? "border-green-500 bg-green-50"
                                 : "border-border"
                             }`}
                           >

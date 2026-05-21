@@ -76,58 +76,11 @@
   --sidebar-border: oklch(0.92 0.01 260);
   --sidebar-ring: oklch(0.55 0.2 260);
 }
-
-.dark {
-  --background: oklch(0.06 0.035 265);
-  --foreground: oklch(0.92 0.015 260);
-  --card: oklch(0.1 0.045 265);
-  --card-foreground: oklch(0.92 0.015 260);
-  --popover: oklch(0.1 0.045 265);
-  --popover-foreground: oklch(0.92 0.015 260);
-  --primary: oklch(0.55 0.18 265);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.17 0.05 265);
-  --secondary-foreground: oklch(0.92 0.015 260);
-  --muted: oklch(0.15 0.04 265);
-  --muted-foreground: oklch(0.65 0.03 260);
-  --accent: oklch(0.2 0.06 275);
-  --accent-foreground: oklch(0.92 0.015 260);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.2 0.05 265 / 50%);
-  --input: oklch(0.2 0.05 265 / 80%);
-  --ring: oklch(0.55 0.18 265);
-  --chart-1: oklch(0.55 0.18 265);
-  --chart-2: oklch(0.65 0.15 200);
-  --chart-3: oklch(0.5 0.14 290);
-  --chart-4: oklch(0.6 0.18 180);
-  --chart-5: oklch(0.65 0.15 320);
-  --sidebar: oklch(0.08 0.04 265);
-  --sidebar-foreground: oklch(0.92 0.015 260);
-  --sidebar-primary: oklch(0.55 0.18 265);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.2 0.06 275);
-  --sidebar-accent-foreground: oklch(0.92 0.015 260);
-  --sidebar-border: oklch(0.2 0.05 265 / 50%);
-  --sidebar-ring: oklch(0.55 0.18 265);
-}
-
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
-  }
-  .dark body, body.dark {
-    background-image:
-      radial-gradient(1px 1px at 10% 20%, oklch(0.8 0.1 265 / 30%), transparent),
-      radial-gradient(1px 1px at 30% 60%, oklch(0.8 0.1 265 / 20%), transparent),
-      radial-gradient(1.5px 1.5px at 50% 10%, oklch(0.9 0.15 280 / 40%), transparent),
-      radial-gradient(1px 1px at 70% 40%, oklch(0.8 0.1 265 / 25%), transparent),
-      radial-gradient(1px 1px at 90% 80%, oklch(0.8 0.1 265 / 30%), transparent),
-      radial-gradient(1.5px 1.5px at 20% 90%, oklch(0.9 0.15 280 / 35%), transparent),
-      radial-gradient(1px 1px at 60% 30%, oklch(0.8 0.1 265 / 20%), transparent),
-      radial-gradient(1px 1px at 80% 70%, oklch(0.8 0.1 265 / 25%), transparent);
   }
 }

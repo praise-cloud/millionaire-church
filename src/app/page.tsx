@@ -16,7 +16,7 @@ import {
   Trophy, UserPlus, Gamepad2, LogOut, LayoutDashboard, Loader2,
   HelpCircle, Phone, Users, Sparkles, ChevronRight, Star, Quote,
 } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+
 
 type UserData = {
   id: string
@@ -98,7 +98,6 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : user ? (
